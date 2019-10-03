@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
+	github.com/go-redis/redis v6.15.5+incompatible
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.11 // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
@@ -13,6 +14,10 @@ require (
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/ugorji/go v1.1.7 // indirect
+	go.uber.org/atomic v1.4.0 // indirect
+	go.uber.org/multierr v1.2.0 // indirect
+	go.uber.org/zap v1.10.0
 	golang.org/x/net v0.0.0-20190926025831-c00fd9afed17 // indirect
 	golang.org/x/sys v0.0.0-20190927073244-c990c680b611 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
