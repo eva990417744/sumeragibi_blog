@@ -1,7 +1,7 @@
 package modes
 
 import (
-	"database/sql"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"sumeragibi_blog/log_init"
@@ -10,32 +10,53 @@ import (
 
 var log = log_init.LogInit()
 
-
 type User struct {
 	gorm.Model
-	Name         string
-	Age          sql.NullInt64
-	Birthday     *time.Time
-	Email        string  `gorm:"type:varchar(100);unique_index"`
-	Role         string  `gorm:"size:255"`        // 设置字段大小为255
-	MemberNumber *string `gorm:"unique;not null"` // 设置会员号（member number）唯一并且不为空
-	Num          int     `gorm:"AUTO_INCREMENT"`  // 设置 num 为自增类型
-	Address      string  `gorm:"index:addr"`      // 给address字段创建名为addr的索引
-	IgnoreMe     int     `gorm:"-"`               // 忽略本字段
+	UserName string `grom:"size:255"`
+	Email    string `gorm:"type:varchar(100);unique_index"`
+	PassWord string `gorm:"size:255"`
 }
 
-func CloseDataBase(db *gorm.DB)  {
-	 err:= db.Close()
-	 if err !=nil{
-	 	log.Error(err.Error())
-	 }
+type Article struct {
+	gorm.Model
+	Title     string `grom:"type:varchar(64);index"`
+	Content   string `grom:"type:text;index"`
+	CreatTime *time.Time
+	Labels    [] *Label `gorm:"many2many:article_labels;"`
+	Reply     [] *Reply `gorm:"many2many:article_reply;"`
 }
 
-func main() {
-	db, err := gorm.Open("postgres", "host=myhost port=myport user=gorm dbname=gorm password=mypassword")
+type Label struct {
+	gorm.Model
+	LabelName string      `grom:"type:varchar(100);index"`
+	Articles  [] *Article `gorm:"many2many:article_labels;"`
+}
+
+type Reply struct {
+	gorm.Model
+	Email     string      `gorm:"type:varchar(100);"`
+	UserName  string      `gorm:"size:255"`
+	Text      string      `gorm:"type:text;"`
+	Articles  [] *Article `gorm:"many2many:article_reply;"`
+	CreatTime *time.Time
+}
+
+func CloseDataBase(db *gorm.DB) {
+	err := db.Close()
 	if err != nil {
 		log.Error(err.Error())
+		panic(fmt.Errorf("Close database error: %s \n", err))
 	}
-	defer CloseDataBase(db)
 }
 
+func DataBaseCline(host string, port string, user string, dbname string, password string) *gorm.DB {
+	args := "host=%s port=%s user=%s dbname=%s password=%s sslmode=disable"
+	args = fmt.Sprintf(args, host, port, user, dbname, password)
+	db, err := gorm.Open("postgres", args)
+	if err != nil {
+		log.Error(err.Error())
+		panic(fmt.Errorf("Cline Database Error: %s \n", err))
+	}
+	db.AutoMigrate(&User{}, &Article{}, &Label{}, &Reply{})
+	return db
+}
